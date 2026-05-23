@@ -26,12 +26,39 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
+      - name: Configure email recipients
+        env:
+          HORIZON_EMAIL_RECIPIENTS: ${{ secrets.HORIZON_EMAIL_RECIPIENTS }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          recipients = [
+              item.strip()
+              for item in os.environ.get("HORIZON_EMAIL_RECIPIENTS", "").split(",")
+              if item.strip()
+          ]
+          Path("data/subscribers.json").write_text(
+              json.dumps(recipients, indent=2) + "\n",
+              encoding="utf-8",
+          )
+          PY
+
       - name: Run Horizon
         env:
           # Values are configured in this fork's repository secrets/variables.
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           OPENAI_BASE_URL: ${{ vars.OPENAI_BASE_URL }}
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+          HORIZON_WEBHOOK_URL: ${{ secrets.HORIZON_WEBHOOK_URL }}
+          HORIZON_EMAIL_ADDRESS: ${{ secrets.HORIZON_EMAIL_ADDRESS }}
+          HORIZON_EMAIL_PASSWORD: ${{ secrets.HORIZON_EMAIL_PASSWORD }}
+          HORIZON_SMTP_SERVER: ${{ vars.HORIZON_SMTP_SERVER }}
+          HORIZON_SMTP_PORT: ${{ vars.HORIZON_SMTP_PORT }}
+          HORIZON_SMTP_USERNAME: ${{ vars.HORIZON_SMTP_USERNAME }}
+          HORIZON_EMAIL_SENDER_NAME: ${{ vars.HORIZON_EMAIL_SENDER_NAME }}
         run: uv run horizon --hours 48
 
       - name: Set current date as environment variable
