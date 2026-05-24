@@ -58,6 +58,12 @@
         "url": "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml",
         "enabled": true,
         "category": "github-trending"
+      },
+      {
+        "name": "RuanyiFeng Weekly",
+        "url": "https://www.ruanyifeng.com/blog/atom.xml",
+        "enabled": true,
+        "category": "technology"
       }
     ],
     "reddit": {
